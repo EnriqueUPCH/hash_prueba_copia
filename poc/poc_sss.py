@@ -1,6 +1,6 @@
 # poc/poc_sss.py
 # PoC de Shamir Secret Sharing (compatibilidad Python 3.12+)
-# Autor: Enrique
+
 
 import secrets
 from functools import reduce
