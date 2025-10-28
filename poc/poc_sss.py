@@ -6,7 +6,6 @@ import secrets
 from functools import reduce
 import os
 
-# --- Implementación básica del algoritmo SSS ---
 def _eval_polynomial(coeffs, x, prime):
     """Evalúa un polinomio con coeficientes mod prime."""
     return sum([coeff * pow(x, i, prime) for i, coeff in enumerate(coeffs)]) % prime
@@ -30,16 +29,16 @@ def recombinar_shares(shares, prime=2**521 - 1):
         return (yj * num * pow(den, -1, prime)) % prime
     return sum(_lagrange_basis(j) for j in range(len(shares))) % prime
 
-# --- Flujo de prueba ---
+# Pruebas
 def main():
     print("=== PoC SSS Básico (sin dependencias externas) ===\n")
 
     # Generar clave maestra (256 bits)
     clave_bytes = secrets.token_bytes(32)
     clave_int = int.from_bytes(clave_bytes, "big")
-    print(f"🔑 Clave maestra (hex): {clave_bytes.hex()}\n")
+    print(f" Clave maestra (hex): {clave_bytes.hex()}\n")
 
-    # Dividir clave
+    # Divide 
     shares = generar_shares(clave_int, n=5, t=3)
     os.makedirs("custodios", exist_ok=True)
     for i, (x, y) in enumerate(shares, 1):
@@ -47,13 +46,13 @@ def main():
             f.write(f"{x},{y}")
     print("🔹 Se generaron 5 partes en /custodios\n")
 
-    # Recuperar usando solo 3
+    # Usar 3 para recuperar
     partes_para_usar = shares[:3]
     clave_recuperada_int = recombinar_shares(partes_para_usar)
     clave_recuperada_bytes = clave_recuperada_int.to_bytes(32, "big")
 
-    print(f"🔒 Clave reconstruida (hex): {clave_recuperada_bytes.hex()}\n")
-    print("✅ Coinciden" if clave_bytes == clave_recuperada_bytes else "❌ Error: no coinciden")
+    print(f" Clave reconstruida (hex): {clave_recuperada_bytes.hex()}\n")
+    print("Coinciden" if clave_bytes == clave_recuperada_bytes else "❌ Error: no coinciden")
 
 if __name__ == "__main__":
     main()
